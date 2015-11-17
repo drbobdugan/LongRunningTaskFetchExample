@@ -24,4 +24,14 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (IBAction)buttonPressed:(id)sender {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    
+    // Initialize start time to compute duration later
+    _startTime = [NSDate date];
+    
+    // Initialize UI fields
+    self.status.text = @"Downloading";
+    self.time.text = @"0";
+}
 @end

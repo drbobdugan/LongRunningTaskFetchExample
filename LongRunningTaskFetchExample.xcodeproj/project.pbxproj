@@ -13,6 +13,7 @@
 		2826058D1BF533CC007F7C24 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2826058B1BF533CC007F7C24 /* Main.storyboard */; };
 		2826058F1BF533CC007F7C24 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2826058E1BF533CC007F7C24 /* Assets.xcassets */; };
 		282605921BF533CC007F7C24 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 282605901BF533CC007F7C24 /* LaunchScreen.storyboard */; };
+		2826059D1BFA4CFE007F7C24 /* BackgroundTimeRemainingUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 2826059C1BFA4CFE007F7C24 /* BackgroundTimeRemainingUtility.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		2826058E1BF533CC007F7C24 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		282605911BF533CC007F7C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		282605931BF533CC007F7C24 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2826059B1BFA4CFE007F7C24 /* BackgroundTimeRemainingUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackgroundTimeRemainingUtility.h; path = ../../NSURLSessionDataTaskExample/NSURLSessionDataTaskExample/BackgroundTimeRemainingUtility.h; sourceTree = "<group>"; };
+		2826059C1BFA4CFE007F7C24 /* BackgroundTimeRemainingUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BackgroundTimeRemainingUtility.m; path = ../../NSURLSessionDataTaskExample/NSURLSessionDataTaskExample/BackgroundTimeRemainingUtility.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,8 @@
 			children = (
 				282605851BF533CC007F7C24 /* AppDelegate.h */,
 				282605861BF533CC007F7C24 /* AppDelegate.m */,
+				2826059B1BFA4CFE007F7C24 /* BackgroundTimeRemainingUtility.h */,
+				2826059C1BFA4CFE007F7C24 /* BackgroundTimeRemainingUtility.m */,
 				282605881BF533CC007F7C24 /* ViewController.h */,
 				282605891BF533CC007F7C24 /* ViewController.m */,
 				2826058B1BF533CC007F7C24 /* Main.storyboard */,
@@ -110,6 +115,11 @@
 				TargetAttributes = {
 					2826057E1BF533CC007F7C24 = {
 						CreatedOnToolsVersion = 7.0.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -149,6 +159,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2826059D1BFA4CFE007F7C24 /* BackgroundTimeRemainingUtility.m in Sources */,
 				2826058A1BF533CC007F7C24 /* ViewController.m in Sources */,
 				282605871BF533CC007F7C24 /* AppDelegate.m in Sources */,
 				282605841BF533CC007F7C24 /* main.m in Sources */,
@@ -264,6 +275,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = LongRunningTaskFetchExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = stonehill.edu.LongRunningTaskFetchExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -275,6 +287,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = LongRunningTaskFetchExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = stonehill.edu.LongRunningTaskFetchExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -300,6 +313,7 @@
 				282605981BF533CC007F7C24 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

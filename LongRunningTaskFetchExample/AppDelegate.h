@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDelegate, NSURLSessionDataDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-
+@property (strong, atomic) NSURLSession *session;
+@property (strong, atomic) NSDate *startTime;
 
 @end
 
