@@ -38,6 +38,137 @@
     return YES;
 }
 
+
+//
+// Delegate for UIApplicationDelegate
+//
+- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier
+// Called when application moves from foreground to background and we are downloading a resource
+  completionHandler:(void (^)()) completionHandler {
+    
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+}
+
+
+//
+// Delegate for UIApplicationDelegate
+//
+-(void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+    _startTime = [NSDate date];
+    NSLog(@"%s begin fetch", __PRETTY_FUNCTION__);
+    [BackgroundTimeRemainingUtility NSLog];
+    
+    // Update UI
+    ViewController *controller= (ViewController *) [[[UIApplication sharedApplication] keyWindow] rootViewController];
+    
+    dispatch_block_t work_to_do = ^{
+        controller.status.text = @"Fetching...";
+        controller.time.text = @"0";
+        controller.data.text = @"";
+    };
+    
+    if ([NSThread isMainThread])
+    {
+        work_to_do();
+    }
+    else
+    {
+        dispatch_sync(dispatch_get_main_queue(), work_to_do);
+    }
+    
+    // Do the fetch
+    NSMutableURLRequest * urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:controller.URL.text]];
+    [urlRequest setHTTPBody:nil];
+    
+    NSURLSessionDataTask *dataTask = [self.session dataTaskWithRequest:urlRequest];
+    [dataTask resume];
+    
+    //
+    //UIBackgroundFetchResultFailed
+    //UIBackgroundFetchResultNoData
+    //UIBackgroundFetchResultNewData
+    //
+    
+    //Tell the system that you are done.
+    completionHandler(UIBackgroundFetchResultNewData);
+    [BackgroundTimeRemainingUtility NSLog];
+    NSLog(@"%s end fetch", __PRETTY_FUNCTION__);
+}
+
+//
+// Delegate of NSURLSessionDataDelegate
+//
+- (void)URLSession:(NSURLSession *)session
+          dataTask:(NSURLSessionDataTask *)dataTask
+    didReceiveData:(NSData *)data
+{
+    // Called when data task has received some data (not applicable for straight upload?)
+    if (data != NULL)
+    {
+        NSLog(@"%s: %@", __PRETTY_FUNCTION__,[[NSString alloc]  initWithBytes:[data bytes] length:[data length] encoding: NSASCIIStringEncoding]);
+    }
+    else
+    {
+        NSLog(@"%s: but no actual data received.", __PRETTY_FUNCTION__);
+    }
+    
+    // If we are not in the "active" or foreground then log some background information to the console
+    if (UIApplication.sharedApplication.applicationState != UIApplicationStateActive)
+    {
+        [BackgroundTimeRemainingUtility NSLog];
+    }
+}
+
+//
+// Delegate of NSURLSessionTaskDelegate
+//
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
+{
+    // Update UI
+    ViewController *controller= (ViewController *) [[[UIApplication sharedApplication] keyWindow] rootViewController];
+    NSDate *stopTime = [NSDate date];
+    NSTimeInterval executionTime = [stopTime timeIntervalSinceDate:controller.startTime];
+    NSString *status;
+    NSString *time =  [NSString stringWithFormat:@"%.1f",executionTime];
+    NSString *data;
+    
+    
+    if (error) {
+        NSLog(@"%s %@ failed: %@", __PRETTY_FUNCTION__, task.originalRequest.URL, error);
+        status = @"Failed";
+        data =[NSString stringWithFormat: @"%@", error];
+    }
+    else
+    {
+        NSLog(@"%s succeeded with response: %@",  __PRETTY_FUNCTION__, task.response);
+        status = @"Ready";
+        data = [NSString stringWithFormat: @"%@", task.response];
+    }
+    
+    dispatch_block_t work_to_do = ^{
+        controller.status.text = status;
+        controller.time.text = time;
+        controller.data.text = data;
+    };
+    
+    if ([NSThread isMainThread])
+    {
+        work_to_do();
+    }
+    else
+    {
+        dispatch_sync(dispatch_get_main_queue(), work_to_do);
+    }
+    
+    
+    // If we are not in the "active" or foreground then log some background information to the console
+    if (UIApplication.sharedApplication.applicationState != UIApplicationStateActive)
+    {
+        [BackgroundTimeRemainingUtility NSLog];
+    }
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -72,63 +203,6 @@
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     NSLog(@"%s", __PRETTY_FUNCTION__);
-}
-
-//
-// Delegate for UIApplicationDelegate
-//
-- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier
-// Called when application moves from foreground to background and we are downloading a resource
-  completionHandler:(void (^)()) completionHandler {
-    
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-}
-
-
-//
-// Delegate for UIApplicationDelegate
-//
--(void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
-{
-    _startTime = [NSDate date];
-    NSLog(@"%s begin fetch", __PRETTY_FUNCTION__);
-    [BackgroundTimeRemainingUtility NSLog];
-    
-    // Update UI
-    ViewController *controller= (ViewController *) [[[UIApplication sharedApplication] keyWindow] rootViewController];
-
-    dispatch_block_t work_to_do = ^{
-        controller.status.text = @"Fetching...";
-        controller.time.text = @"0";
-        controller.data.text = @"";
-    };
-    
-    if ([NSThread isMainThread])
-    {
-        work_to_do();
-    }
-    else
-    {
-        dispatch_sync(dispatch_get_main_queue(), work_to_do);
-    }
-    
-    // Do the fetch
-    NSMutableURLRequest * urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:controller.URL.text]];
-    [urlRequest setHTTPBody:nil];
-    
-    NSURLSessionDataTask *dataTask = [self.session dataTaskWithRequest:urlRequest];
-    [dataTask resume];
-    
-    //
-    //UIBackgroundFetchResultFailed
-    //UIBackgroundFetchResultNoData
-    //UIBackgroundFetchResultNewData
-    //
-    
-    //Tell the system that you are done.
-    completionHandler(UIBackgroundFetchResultNewData);
-    [BackgroundTimeRemainingUtility NSLog];
-    NSLog(@"%s end fetch", __PRETTY_FUNCTION__);
 }
 
 //
@@ -188,79 +262,6 @@ didBecomeDownloadTask:(NSURLSessionDownloadTask *)downloadTask
 }
 
 //
-// Delegate of NSURLSessionDataDelegate
-//
-- (void)URLSession:(NSURLSession *)session
-          dataTask:(NSURLSessionDataTask *)dataTask
-    didReceiveData:(NSData *)data
-{
-    // Called when data task has received some data (not applicable for straight upload?)
-    if (data != NULL)
-    {
-        NSLog(@"%s: %@", __PRETTY_FUNCTION__,[[NSString alloc]  initWithBytes:[data bytes] length:[data length] encoding: NSASCIIStringEncoding]);
-    }
-    else
-    {
-        NSLog(@"%s: but no actual data received.", __PRETTY_FUNCTION__);
-    }
-    
-    // If we are not in the "active" or foreground then log some background information to the console
-    if (UIApplication.sharedApplication.applicationState != UIApplicationStateActive)
-    {
-        [BackgroundTimeRemainingUtility NSLog];
-    }
-}
-
-//
-// Delegate of NSURLSessionTaskDelegate
-//
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
-{
-    // Update UI
-    ViewController *controller= (ViewController *) [[[UIApplication sharedApplication] keyWindow] rootViewController];
-    NSDate *stopTime = [NSDate date];
-    NSTimeInterval executionTime = [stopTime timeIntervalSinceDate:controller.startTime];
-    NSString *status;
-    NSString *time =  [NSString stringWithFormat:@"%.1f",executionTime];
-    NSString *data;
-   
-    
-    if (error) {
-        NSLog(@"%s %@ failed: %@", __PRETTY_FUNCTION__, task.originalRequest.URL, error);
-        status = @"Failed";
-        data =[NSString stringWithFormat: @"%@", error];
-    }
-    else
-    {
-        NSLog(@"%s succeeded with response: %@",  __PRETTY_FUNCTION__, task.response);
-        status = @"Ready";
-        data = [NSString stringWithFormat: @"%@", task.response];
-    }
-    
-    dispatch_block_t work_to_do = ^{
-        controller.status.text = status;
-        controller.time.text = time;
-        controller.data.text = data;
-    };
-    
-    if ([NSThread isMainThread])
-    {
-        work_to_do();
-    }
-    else
-    {
-        dispatch_sync(dispatch_get_main_queue(), work_to_do);
-    }
-
-    
-    // If we are not in the "active" or foreground then log some background information to the console
-    if (UIApplication.sharedApplication.applicationState != UIApplicationStateActive)
-    {
-        [BackgroundTimeRemainingUtility NSLog];
-    }
-}
-
-//
 // Delegate of NSURLSessionTaskDelegate (NOT CALLED IN THIS EXAMPLE)
 //
 - (void)URLSession:(NSURLSession *)session
@@ -275,7 +276,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
 }
 
 //
-// Delegate of NSURLSessionTaskDelegate (NOT CALLED IN THIS EXAMPLE)
+// Delegate of NSURLSessionTaskDelegate
 //
 - (void)URLSession:(NSURLSession *)session
           dataTask:(NSURLSessionDataTask *)dataTask
@@ -346,7 +347,7 @@ totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
 
 
 //
-// Delegate of NSURLSessionTaskDelegate  (NOT CALLED IN THIS EXAMPLE)
+// Delegate of NSURLSessionTaskDelegate
 //
 - (void)URLSession:(NSURLSession *)session
               task:(NSURLSessionTask *)task
